@@ -11,11 +11,11 @@ spec:
     # - host: {{ .Values.ingress.host }}
       - http:
           paths:
-            - path: /
+            - path: /afrione
               pathType: Prefix
               backend:
                 service:
                   name: {{ .Values.fullnameOverride }}
                   port:
-                    number: 8080
+                    number: 80
 {{- end }}
