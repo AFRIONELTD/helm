@@ -3,12 +3,12 @@ entries:
   afrione-website:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-04-15T15:11:26.468365+01:00"
+    created: "2024-04-15T15:26:18.765394+01:00"
     description: A Helm chart for Kubernetes
-    digest: ffd3e8a98c9c79816ebd56e77130fd1e0a82bcefee5098cc5be4e6a5fb7bb6c8
+    digest: befe808d7cdd3df924072c6d51f11f8ff4854aba1250aa9f3fd742128e760bb5
     name: afrione-website
     type: application
     urls:
     - https://afrioneltd.github.io/helm/afrione-website-0.1.0.tgz
     version: 0.1.0
-generated: "2024-04-15T15:11:26.467809+01:00"
+generated: "2024-04-15T15:26:18.764163+01:00"
