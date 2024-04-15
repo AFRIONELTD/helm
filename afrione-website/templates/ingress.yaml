@@ -17,5 +17,5 @@ spec:
                 service:
                   name: {{ .Values.fullnameOverride }}
                   port:
-                    number: 80
+                    number: 8080
 {{- end }}
