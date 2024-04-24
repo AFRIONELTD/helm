@@ -1,15 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "afrione-api.fullname" . }}
-  labels:
-    {{- include "afrione-api.labels" . | nindent 4 }}
+  name: {{ .Values.fullnameOverride }}
+  # annotations:
+  #   cloud.google.com/neg: '{"ingress": false}'
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  type: NodePort
   selector:
-    {{- include "afrione-api.selectorLabels" . | nindent 4 }}
+    app : {{ .Values.fullnameOverride }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.containerPort | default 80 }}
+      nodePort: 30009
+    - name: https
+      port: 443
+      targetPort: {{ .Values.containerPort | default 80 }}
+      nodePort: 30010
