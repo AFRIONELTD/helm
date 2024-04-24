@@ -1,68 +1,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "afrione-api.fullname" . }}
-  labels:
-    {{- include "afrione-api.labels" . | nindent 4 }}
+  name: {{ .Values.fullnameOverride}}
+  namespace: {{ .Values.namespace }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
-    matchLabels:
-      {{- include "afrione-api.selectorLabels" . | nindent 6 }}
+   matchLabels:
+    app: {{ .Values.fullnameOverride }}
+  replicas: {{ .Values.replicaCount | default 1 }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  minReadySeconds: 60
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "afrione-api.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app: {{ .Values.fullnameOverride }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "afrione-api.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      - name: {{ .Values.fullnameOverride }}
+        image: {{ .Values.image.repository }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.containerPort}} 
+          name: http
+          protocol: TCP
+        {{- if .Values.lProbe.enabled }} #If enabled=true in the values.yaml, declare the probe parameters in the values.yaml
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.rProbe.enabled }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+        resources:
+        {{- $resources := .Values.resources | default dict }}
+        {{- if $resources }}
+          requests:
+            cpu: {{ $resources.requests.cpu | default "1" | quote}}
+            memory: {{ $resources.requests.memory | default "2Gi" | quote}} 
+            ephemeral-storage: 500Mi 
+          limits:
+            cpu: {{ $resources.limits.cpu | default "2" | quote}}
+            memory: {{ $resources.limits.memory | default "3Gi" | quote}}
+            ephemeral-storage: 2Gi 
+        {{- else }}
+          requests:
+            cpu: 1
+            memory: 2Gi
+            ephemeral-storage: 500Mi
+          limits:
+            cpu: 2
+            memory: 3Gi
+            ephemeral-storage: 2Gi
+        {{- end }}
