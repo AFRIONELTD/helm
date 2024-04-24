@@ -48,7 +48,7 @@ spec:
             memory: {{ $resources.requests.memory | default "2Gi" | quote}} 
             ephemeral-storage: 500Mi 
           limits:
-            cpu: {{ $resources.limits.cpu | default "3" | quote}}
+            cpu: {{ $resources.limits.cpu | default "2" | quote}}
             memory: {{ $resources.limits.memory | default "3Gi" | quote}}
             ephemeral-storage: 2Gi 
         {{- else }}
@@ -57,7 +57,7 @@ spec:
             memory: 2Gi
             ephemeral-storage: 500Mi
           limits:
-            cpu: 3
+            cpu: 2
             memory: 3Gi
             ephemeral-storage: 2Gi
         {{- end }}
