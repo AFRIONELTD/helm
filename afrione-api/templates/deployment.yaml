@@ -61,3 +61,22 @@ spec:
             memory: 3Gi
             ephemeral-storage: 2Gi
         {{- end }}
+        env:
+        - name: ACCOUNT_SERVICE_SERVICE_HOST
+          value: http://account-service
+        - name: SPRING_PROFILES_ACTIVE
+          value: dev
+        - name: KUBERNETES_NAMESPACE
+          value: api-gateway
+        - name: KAFKA_BROKERS_URL
+          value: "PLAINTEXT://52.56.45.213:9092,PLAINTEXT://52.56.45.213:9093"
+        volumeMounts:
+        - name: config
+          mountPath: "/config"
+          readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: account-service
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 20
